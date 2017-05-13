@@ -5,4 +5,5 @@
     <string name="ok">OK</string>
     <string name="target_reached">Target reached!</string>
     <string name="congratulations">Congratulations! You have chosen target %1$s!</string>
+    <string name="drag_center_to_target">Drag a center button to pick a target!</string>
 </resources>
