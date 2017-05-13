@@ -1,9 +1,7 @@
 package com.example.dragger;
 
 import android.os.Bundle;
-import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -14,7 +12,12 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MainActivity extends AppCompatActivity {
+import static com.example.dragger.GeometryHelper.getDistance;
+import static com.example.dragger.GeometryHelper.getPosition;
+import static com.example.dragger.GeometryHelper.getRadius;
+import static com.example.dragger.SuccessDialog.showSelectedTargetDialog;
+
+public class MainActivity extends AppCompatActivity implements DialogCallback{
 
     @BindView(R.id.centerButton)
     Button centerButton;
@@ -32,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private float mXdifference;
     private float mYdifference;
     private List<Button> mTargetList;
+
 
     @Override
 
@@ -57,9 +61,6 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case MotionEvent.ACTION_UP:
                         v.setPressed(false);
-                        View parent = (View) v.getParent();
-                        v.setX((parent.getWidth() / 2 - getRadius(v)));
-                        v.setY((parent.getHeight() / 2 - getRadius(v)));
                 }
                 return true;
             }
@@ -89,29 +90,20 @@ public class MainActivity extends AppCompatActivity {
         }
         return targetList;
     }
-
+    
     private boolean isTouchingTarget(View target, double distance) {
         return distance <= getRadius(centerButton) + getRadius(target);
     }
 
-    private Pair<Float, Float> getPosition(View view) {
-        return new Pair<>(view.getX() + getRadius(view),
-                view.getY() + getRadius(view));
-    }
-
-    private float getRadius(View view) {
-        if (view.getHeight() == view.getWidth())
-            return view.getHeight() / 2;
-        else throw new IllegalStateException(getString(R.string.not_square_exception));
-    }
-
     private void onTargetReached(int index) {
-        Log.i(TAG, "Target " + (index + 1) + " reached");
+        showSelectedTargetDialog(this, index + 1, this);
      }
 
-    private double getDistance(Pair<Float, Float> point1, Pair<Float, Float> point2) {
-        double xDistance = Math.pow((point1.first - point2.first), 2);
-        double yDistance = Math.pow((point1.second - point2.second), 2);
-        return Math.sqrt(xDistance + yDistance);
+    @Override
+    public void resetCenterButton() {
+        centerButton.setPressed(false);
+        View parent = (View) centerButton.getParent();
+        centerButton.setX((parent.getWidth() / 2 - getRadius(centerButton)));
+        centerButton.setY((parent.getHeight() / 2 - getRadius(centerButton)));
     }
 }
